@@ -1,1475 +1,188 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TriangleStory — TikTok Creator</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
-
-  :root {
-    --bg: #080a0e;
-    --surface: #0f1117;
-    --card: #141820;
-    --border: rgba(255,255,255,0.07);
-    --accent: #ff3c5f;
-    --accent2: #ff9f1c;
-    --text: #f0f0f0;
-    --muted: #6b7280;
-    --success: #22c55e;
-    --radius: 12px;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
-    pointer-events: none;
-    z-index: 1000;
-  }
-
-  header {
-    padding: 2rem 3rem 1.5rem;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .logo { display: flex; align-items: center; gap: 12px; }
-
-  .logo-icon {
-    width: 36px; height: 36px;
-    background: var(--accent);
-    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-  }
-
-  .logo-text {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 28px;
-    letter-spacing: 2px;
-    color: var(--text);
-  }
-
-  .logo-badge {
-    font-size: 10px;
-    background: rgba(255,60,95,0.15);
-    border: 1px solid rgba(255,60,95,0.3);
-    color: var(--accent);
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-weight: 600;
-    letter-spacing: 1px;
-  }
-
-  .badge-count {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    color: var(--muted);
-  }
-
-  main {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 2.5rem 3rem;
-    display: grid;
-    grid-template-columns: 1fr 1.4fr;
-    gap: 2rem;
-    align-items: start;
-  }
-
-  .section-label {
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 2px;
-    color: var(--muted);
-    text-transform: uppercase;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .section-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-
-  .left-col { display: flex; flex-direction: column; gap: 1.5rem; }
-
-  /* Drop zone */
-  .drop-zone {
-    border: 1.5px dashed rgba(255,60,95,0.4);
-    border-radius: var(--radius);
-    padding: 2.5rem 2rem;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    background: rgba(255,60,95,0.03);
-  }
-
-  .drop-zone:hover, .drop-zone.drag-over {
-    border-color: var(--accent);
-    background: rgba(255,60,95,0.08);
-  }
-
-  .drop-icon {
-    width: 48px; height: 48px;
-    margin: 0 auto 1rem;
-    background: rgba(255,60,95,0.1);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .drop-icon svg { width: 24px; height: 24px; fill: var(--accent); }
-
-  .drop-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 20px;
-    letter-spacing: 1px;
-    margin-bottom: 6px;
-  }
-
-  .drop-sub { font-size: 13px; color: var(--muted); }
-
-  /* Audio list */
-  .audio-list { display: flex; flex-direction: column; gap: 8px; }
-
-  .audio-item {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    animation: slideIn 0.2s ease;
-  }
-
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateX(-10px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-
-  .audio-num {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--accent);
-    min-width: 20px;
-  }
-
-  .audio-name { flex: 1; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .audio-dur { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
-
-  .btn-remove {
-    width: 20px; height: 20px;
-    background: none; border: none;
-    color: var(--muted); cursor: pointer;
-    font-size: 16px; line-height: 1;
-    border-radius: 4px; transition: all 0.15s;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .btn-remove:hover { color: var(--accent); background: rgba(255,60,95,0.1); }
-
-  /* Video grid */
-  .video-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-  }
-
-  .video-slot {
-    background: var(--card);
-    border: 1.5px dashed var(--border);
-    border-radius: 10px;
-    aspect-ratio: 9/16;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .video-slot:hover { border-color: rgba(255,159,28,0.5); background: rgba(255,159,28,0.04); }
-  .video-slot.loaded { border-style: solid; border-color: rgba(255,159,28,0.4); }
-
-  .video-slot video {
-    position: absolute; inset: 0;
-    width: 100%; height: 100%;
-    object-fit: cover; opacity: 0.6;
-  }
-
-  .video-slot-label {
-    position: relative;
-    font-size: 11px; color: var(--muted);
-    text-align: center; padding: 8px;
-  }
-
-  .video-slot-name {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    background: linear-gradient(transparent, rgba(0,0,0,0.85));
-    padding: 24px 8px 8px;
-    font-size: 11px; color: var(--text); font-weight: 500;
-  }
-
-  .slot-add {
-    width: 28px; height: 28px;
-    background: rgba(255,159,28,0.1);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; color: var(--accent2); position: relative;
-  }
-
-  .video-slot-remove {
-    position: absolute; top: 6px; right: 6px;
-    background: rgba(0,0,0,0.6); border: none; border-radius: 50%;
-    width: 22px; height: 22px; color: #fff; font-size: 13px;
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
-    z-index: 10; transition: background 0.15s;
-  }
-  .video-slot-remove:hover { background: var(--accent); }
-
-  /* Settings */
-  .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-  .setting-item {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 16px;
-  }
-
-  .setting-label {
-    font-size: 11px; color: var(--muted);
-    margin-bottom: 8px; font-weight: 500;
-  }
-
-  select, input[type="range"] {
-    width: 100%;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text);
-    border-radius: 6px;
-    padding: 6px 10px;
-    font-size: 13px;
-    font-family: 'DM Sans', sans-serif;
-    outline: none; cursor: pointer;
-  }
-
-  select:focus { border-color: rgba(255,60,95,0.5); }
-
-  input[type="range"] {
-    padding: 4px 0;
-    accent-color: var(--accent);
-  }
-
-  .range-val {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px; color: var(--accent);
-    margin-top: 4px; text-align: right;
-  }
-
-  /* Subtitle preview */
-  .subtitle-preview {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 16px;
-  }
-
-  .subtitle-demo {
-    background: #000;
-    border-radius: 8px;
-    aspect-ratio: 9/16;
-    max-height: 180px;
-    position: relative;
-    overflow: hidden;
-    margin-top: 10px;
-    display: flex; align-items: flex-end; justify-content: center;
-    padding-bottom: 20%;
-  }
-
-  .subtitle-demo-text {
-    white-space: nowrap;
-    font-size: 14px;
-    font-weight: 800;
-    text-align: center;
-    padding: 4px 10px;
-    border-radius: 4px;
-    transition: all 0.3s;
-  }
-
-  /* Right column */
-  .right-col { display: flex; flex-direction: column; gap: 1.5rem; position: sticky; top: 2rem; }
-
-  /* Queue */
-  .queue-container {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-  }
-
-  .queue-header {
-    padding: 14px 18px;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-    background: var(--surface);
-  }
-
-  .queue-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 18px; letter-spacing: 1px;
-  }
-
-  .queue-list {
-    max-height: 360px;
-    overflow-y: auto;
-    padding: 12px;
-    display: flex; flex-direction: column; gap: 8px;
-  }
-
-  .queue-list::-webkit-scrollbar { width: 4px; }
-  .queue-list::-webkit-scrollbar-track { background: transparent; }
-  .queue-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-  .queue-item {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 14px;
-    display: flex; align-items: center; gap: 12px;
-    position: relative; overflow: hidden;
-  }
-
-  .queue-item-progress {
-    position: absolute; left: 0; top: 0; bottom: 0;
-    background: rgba(255,60,95,0.08);
-    transition: width 0.3s; width: 0;
-  }
-
-  .queue-item.done .queue-item-progress { background: rgba(34,197,94,0.08); }
-
-  .queue-item-num {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px; color: var(--accent); min-width: 24px; position: relative;
-  }
-
-  .queue-item-info { flex: 1; position: relative; min-width: 0; }
-
-  .queue-item-title {
-    font-size: 13px; font-weight: 500;
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  }
-
-  .queue-item-meta {
-    font-size: 11px; color: var(--muted);
-    margin-top: 2px; display: flex; gap: 8px; align-items: center;
-  }
-
-  .status-dot {
-    width: 6px; height: 6px; border-radius: 50%; display: inline-block;
-  }
-  .status-dot.waiting { background: var(--muted); }
-  .status-dot.processing { background: var(--accent2); animation: pulse 1s infinite; }
-  .status-dot.done { background: var(--success); }
-  .status-dot.error { background: var(--accent); }
-
-  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
-
-  .queue-item-actions { display: flex; gap: 6px; position: relative; }
-
-  .btn-dl {
-    background: rgba(34,197,94,0.1);
-    border: 1px solid rgba(34,197,94,0.3);
-    color: var(--success);
-    border-radius: 6px; padding: 4px 10px;
-    font-size: 11px; font-weight: 600; cursor: pointer;
-    transition: all 0.15s; white-space: nowrap;
-  }
-  .btn-dl:hover { background: rgba(34,197,94,0.2); }
-
-  /* Generate button */
-  .btn-generate {
-    background: var(--accent); border: none;
-    color: white; padding: 16px 32px;
-    border-radius: 10px;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px; letter-spacing: 2px;
-    cursor: pointer; width: 100%;
-    transition: all 0.2s;
-    position: relative; overflow: hidden;
-  }
-  .btn-generate:hover { background: #ff1a40; transform: translateY(-1px); }
-  .btn-generate:active { transform: translateY(0); }
-  .btn-generate:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-  .btn-generate::after {
-    content: '';
-    position: absolute; inset: 0;
-    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
-    transform: translateX(-100%); transition: transform 0.5s;
-  }
-  .btn-generate:hover::after { transform: translateX(100%); }
-
-  /* Stats */
-  .stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-
-  .stat-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 10px; padding: 14px; text-align: center;
-  }
-
-  .stat-val {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 28px; line-height: 1; margin-bottom: 4px;
-  }
-
-  .stat-lbl { font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
-
-  /* Log */
-  .log-box {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px; padding: 14px 16px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px; color: var(--muted);
-    max-height: 130px; overflow-y: auto; line-height: 1.8;
-  }
-
-  .log-line { display: flex; gap: 8px; }
-  .log-time { color: rgba(255,60,95,0.6); }
-  .log-msg.ok { color: var(--success); }
-  .log-msg.warn { color: var(--accent2); }
-  .log-msg.err { color: var(--accent); }
-  .log-msg.info { color: var(--muted); }
-
-  /* Notif */
-  .notif {
-    position: fixed; top: 20px; right: 20px;
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 10px; padding: 14px 18px;
-    font-size: 13px; z-index: 9999;
-    transform: translateX(140%); transition: transform 0.3s ease;
-    max-width: 320px; display: flex; align-items: center; gap: 10px;
-  }
-  .notif.show { transform: translateX(0); }
-  .notif-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-
-  /* Batch controls */
-  .batch-controls {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
-  }
-
-  .btn-secondary {
-    background: var(--surface); border: 1px solid var(--border);
-    color: var(--text); padding: 10px 16px; border-radius: 8px;
-    font-size: 13px; font-weight: 500; cursor: pointer;
-    transition: all 0.15s; white-space: nowrap; flex: 1; text-align: center;
-  }
-  .btn-secondary:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); }
-
-  .btn-dl-all {
-    background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3);
-    color: var(--success); padding: 10px 20px; border-radius: 8px;
-    font-size: 13px; font-weight: 600; cursor: pointer;
-    transition: all 0.15s; flex: 1; text-align: center;
-  }
-  .btn-dl-all:hover { background: rgba(34,197,94,0.2); }
-
-  .empty-queue { text-align: center; padding: 2rem; color: var(--muted); font-size: 13px; }
-  .empty-queue .big { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: var(--border); }
-
-  .toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-
-  .toggle {
-    width: 36px; height: 20px; background: var(--muted);
-    border-radius: 10px; position: relative; cursor: pointer;
-    transition: background 0.2s; flex-shrink: 0; border: none;
-  }
-  .toggle.on { background: var(--accent); }
-  .toggle::after {
-    content: ''; position: absolute;
-    width: 14px; height: 14px; background: white;
-    border-radius: 50%; top: 3px; left: 3px; transition: left 0.2s;
-  }
-  .toggle.on::after { left: 19px; }
-
-  .color-swatch { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
-
-  .swatch {
-    width: 22px; height: 22px; border-radius: 50%;
-    cursor: pointer; border: 2px solid transparent; transition: border-color 0.15s;
-  }
-  .swatch.selected { border-color: white; }
-
-  .warning-banner {
-    background: rgba(255,159,28,0.08);
-    border: 1px solid rgba(255,159,28,0.2);
-    border-radius: 10px; padding: 12px 16px;
-    font-size: 12px; color: rgba(255,159,28,0.9); line-height: 1.6;
-  }
-
-  #audioInput, #videoInputHidden { display: none; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TriangleStory — TikTok Creator</title>
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<header>
-  <div class="logo">
-    <div class="logo-icon"></div>
-    <span class="logo-text">TriangleStory</span>
-    <span class="logo-badge">TIKTOK CREATOR</span>
-  </div>
-  <span class="badge-count" id="totalCount">0 audios · 0 vidéos</span>
-</header>
-
-<main>
-  <!-- Left column -->
-  <div class="left-col">
-
-    <div class="section-label">AUDIOS (histoires)</div>
-
-    <div class="drop-zone" id="dropZone">
-      <div class="drop-icon">
-        <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 110 18A9 9 0 0112 3zm0 2a7 7 0 100 14A7 7 0 0012 5zm-1 3h2v3h3v2h-3v3h-2v-3H8v-2h3V8z"/></svg>
-      </div>
-      <div class="drop-title">Glisse tes audios ici</div>
-      <div class="drop-sub">MP3, WAV, M4A, OGG — plusieurs fichiers d'un coup</div>
+  <header>
+    <div class="logo">
+      <div class="logo-icon"></div>
+      <span class="logo-text">TriangleStory</span>
+      <span class="logo-badge">TIKTOK CREATOR</span>
     </div>
+    <span class="badge-count" id="totalCount">0 audios · 0 vidéos</span>
+  </header>
 
-    <div class="audio-list" id="audioList"></div>
+  <main>
+    <!-- Left column -->
+    <div class="left-col">
 
-    <div class="section-label">VIDÉOS GAMEPLAY</div>
+      <div class="section-label">AUDIOS (histoires)</div>
 
-    <div class="video-grid" id="videoGrid"></div>
-
-    <div class="warning-banner">
-      ⚠️ Traitement 100% dans le navigateur. Utilise des vidéos courtes (max 3 min) pour de meilleures performances. Les sous-titres sont auto-générés selon la durée de l'audio.
-    </div>
-
-    <div class="section-label">PARAMÈTRES</div>
-
-    <div class="settings-grid">
-      <div class="setting-item">
-        <div class="setting-label">Sélection gameplay</div>
-        <select id="videoMode">
-          <option value="random">Aléatoire (par vidéo)</option>
-          <option value="shuffle">Mélangé sans répétition</option>
-          <option value="sequential">Séquentiel</option>
-        </select>
+      <div class="drop-zone" id="dropZone">
+        <div class="drop-icon">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 3a9 9 0 110 18A9 9 0 0112 3zm0 2a7 7 0 100 14A7 7 0 0012 5zm-1 3h2v3h3v2h-3v3h-2v-3H8v-2h3V8z" />
+          </svg>
+        </div>
+        <div class="drop-title">Glisse tes audios ici</div>
+        <div class="drop-sub">MP3, WAV, M4A, OGG — plusieurs fichiers d'un coup</div>
       </div>
-      <div class="setting-item">
-        <div class="setting-label">Volume audio histoire</div>
-        <input type="range" id="audioVol" min="0" max="100" value="90">
-        <div class="range-val" id="audioVolVal">90%</div>
-      </div>
-      <div class="setting-item">
-        <div class="setting-label">Volume gameplay</div>
-        <input type="range" id="gameVol" min="0" max="100" value="8">
-        <div class="range-val" id="gameVolVal">8%</div>
-      </div>
-      <div class="setting-item">
-        <div class="setting-label">Format de sortie</div>
-        <select id="outputFormat">
-          <option value="9:16">9:16 TikTok vertical</option>
-          <option value="1:1">1:1 Carré</option>
-          <option value="16:9">16:9 Paysage</option>
-        </select>
-      </div>
-    </div>
 
-    <!-- Subtitle section -->
-    <div class="subtitle-preview">
-      <div class="setting-label" style="display:flex;justify-content:space-between;align-items:center">
-        Sous-titres
-        <button class="toggle on" id="subtitleToggle" onclick="toggleSubtitles()"></button>
+      <div class="audio-list" id="audioList"></div>
+
+      <div class="section-label">VIDÉOS GAMEPLAY</div>
+
+      <div class="video-grid" id="videoGrid"></div>
+
+      <div class="warning-banner">
+        ⚠️ Traitement 100% dans le navigateur. Utilise des vidéos courtes (max 3 min) pour de meilleures performances.
+        Les sous-titres sont auto-générés selon la durée de l'audio.
       </div>
-      <div class="settings-grid" style="margin-top:12px">
+
+      <div class="section-label">PARAMÈTRES</div>
+
+      <div class="settings-grid">
         <div class="setting-item">
-          <div class="setting-label">Style</div>
-          <select id="subtitleStyle" onchange="updateSubPreview()">
-            <option value="tiktok">TikTok Bold</option>
-            <option value="clean">Clean White</option>
-            <option value="outline">Outline Black</option>
-            <option value="highlight">Highlight Color</option>
+          <div class="setting-label">Sélection gameplay</div>
+          <select id="videoMode">
+            <option value="random">Aléatoire (par vidéo)</option>
+            <option value="shuffle">Mélangé sans répétition</option>
+            <option value="sequential">Séquentiel</option>
           </select>
         </div>
         <div class="setting-item">
-          <div class="setting-label">Couleur accent</div>
-          <div class="color-swatch" id="colorPicker">
-            <div class="swatch selected" style="background:#ff3c5f" data-c="#ff3c5f" onclick="pickColor(this)"></div>
-            <div class="swatch" style="background:#ff9f1c" data-c="#ff9f1c" onclick="pickColor(this)"></div>
-            <div class="swatch" style="background:#22c55e" data-c="#22c55e" onclick="pickColor(this)"></div>
-            <div class="swatch" style="background:#3b82f6" data-c="#3b82f6" onclick="pickColor(this)"></div>
-            <div class="swatch" style="background:#a855f7" data-c="#a855f7" onclick="pickColor(this)"></div>
-            <div class="swatch" style="background:#fff" data-c="#ffffff" onclick="pickColor(this)"></div>
+          <div class="setting-label">Volume audio histoire</div>
+          <input type="range" id="audioVol" min="0" max="100" value="90">
+          <div class="range-val" id="audioVolVal">90%</div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-label">Volume gameplay</div>
+          <input type="range" id="gameVol" min="0" max="100" value="8">
+          <div class="range-val" id="gameVolVal">8%</div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-label">Format de sortie</div>
+          <select id="outputFormat">
+            <option value="9:16">9:16 TikTok vertical</option>
+            <option value="1:1">1:1 Carré</option>
+            <option value="16:9">16:9 Paysage</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Subtitle section -->
+      <div class="subtitle-preview">
+        <div class="setting-label" style="display:flex;justify-content:space-between;align-items:center">
+          Sous-titres
+          <button class="toggle on" id="subtitleToggle" onclick="toggleSubtitles()"></button>
+        </div>
+        <div class="settings-grid" style="margin-top:12px">
+          <div class="setting-item">
+            <div class="setting-label">Style</div>
+            <select id="subtitleStyle" onchange="updateSubPreview()">
+              <option value="tiktok">TikTok Bold</option>
+              <option value="clean">Clean White</option>
+              <option value="outline">Outline Black</option>
+              <option value="highlight">Highlight Color</option>
+            </select>
+          </div>
+          <div class="setting-item">
+            <div class="setting-label">Couleur accent</div>
+            <div class="color-swatch" id="colorPicker">
+              <div class="swatch selected" style="background:#ff3c5f" data-c="#ff3c5f" onclick="pickColor(this)"></div>
+              <div class="swatch" style="background:#ff9f1c" data-c="#ff9f1c" onclick="pickColor(this)"></div>
+              <div class="swatch" style="background:#22c55e" data-c="#22c55e" onclick="pickColor(this)"></div>
+              <div class="swatch" style="background:#3b82f6" data-c="#3b82f6" onclick="pickColor(this)"></div>
+              <div class="swatch" style="background:#a855f7" data-c="#a855f7" onclick="pickColor(this)"></div>
+              <div class="swatch" style="background:#fff" data-c="#ffffff" onclick="pickColor(this)"></div>
+            </div>
+          </div>
+          <div class="setting-item" style="grid-column: span 2;">
+            <div class="setting-label">Clé API Google (Sous-titres)</div>
+            <input type="text" id="googleApiKeyInput" placeholder="Votre clé API Google"
+              style="background:var(--surface);border:1px solid var(--border);color:white;width:100%;padding:8px;border-radius:6px;font-size:12px;font-family:monospace;"
+              onchange="saveApiKey(this.value)">
+          </div>
+        </div>
+        <div class="subtitle-demo" id="subDemo">
+          <div class="subtitle-demo-text" id="subPreviewText">UNE HISTOIRE DE TRIANGLE...</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right column -->
+    <div class="right-col">
+
+      <div class="stats-bar">
+        <div class="stat-card">
+          <div class="stat-val" id="statAudios" style="color:var(--accent)">0</div>
+          <div class="stat-lbl">Audios</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="statVideos" style="color:var(--accent2)">0</div>
+          <div class="stat-lbl">Gameplays</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="statDone" style="color:var(--success)">0</div>
+          <div class="stat-lbl">Terminés</div>
+        </div>
+      </div>
+
+      <div class="queue-container">
+        <div class="queue-header">
+          <span class="queue-title">FILE DE RENDU</span>
+          <span style="font-size:11px;color:var(--muted)" id="queueCount">0 vidéos</span>
+        </div>
+        <div class="queue-list" id="queueList">
+          <div class="empty-queue">
+            <div class="big">▷</div>
+            Ajoute des audios et des gameplays<br>puis clique sur Générer
           </div>
         </div>
       </div>
-      <div class="subtitle-demo" id="subDemo">
-        <div class="subtitle-demo-text" id="subPreviewText">UNE HISTOIRE DE TRIANGLE...</div>
-      </div>
-    </div>
 
-  </div>
+      <button class="btn-generate" id="generateBtn" onclick="startGeneration()">
+        ▶ GÉNÉRER LES VIDÉOS
+      </button>
 
-  <!-- Right column -->
-  <div class="right-col">
+      <div class="batch-controls">
+        <button class="btn-secondary" onclick="clearAll()">🗑 Tout effacer</button>
+        <button class="btn-secondary" onclick="addAllToQueue()">+ Ajouter en file</button>
+        <button class="btn-dl-all" id="dlAllBtn" onclick="downloadAll()" style="display:none">⬇ Tout
+          télécharger</button>
+      </div>
 
-    <div class="stats-bar">
-      <div class="stat-card">
-        <div class="stat-val" id="statAudios" style="color:var(--accent)">0</div>
-        <div class="stat-lbl">Audios</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-val" id="statVideos" style="color:var(--accent2)">0</div>
-        <div class="stat-lbl">Gameplays</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-val" id="statDone" style="color:var(--success)">0</div>
-        <div class="stat-lbl">Terminés</div>
-      </div>
-    </div>
-
-    <div class="queue-container">
-      <div class="queue-header">
-        <span class="queue-title">FILE DE RENDU</span>
-        <span style="font-size:11px;color:var(--muted)" id="queueCount">0 vidéos</span>
-      </div>
-      <div class="queue-list" id="queueList">
-        <div class="empty-queue">
-          <div class="big">▷</div>
-          Ajoute des audios et des gameplays<br>puis clique sur Générer
+      <div class="section-label">JOURNAL</div>
+      <div class="log-box" id="logBox">
+        <div class="log-line">
+          <span class="log-time">00:00</span>
+          <span class="log-msg info">TriangleStory prêt. Charge tes audios et gameplays.</span>
         </div>
       </div>
+
     </div>
+  </main>
 
-    <button class="btn-generate" id="generateBtn" onclick="startGeneration()">
-      ▶ GÉNÉRER LES VIDÉOS
-    </button>
+  <!-- Hidden inputs -->
+  <input type="file" id="audioInput" accept="audio/*" multiple onchange="handleAudioFiles(this.files)">
+  <input type="file" id="videoInputHidden" accept="video/*" onchange="handleVideoFileFromInput(this)">
 
-    <div class="batch-controls">
-      <button class="btn-secondary" onclick="clearAll()">🗑 Tout effacer</button>
-      <button class="btn-secondary" onclick="addAllToQueue()">+ Ajouter en file</button>
-      <button class="btn-dl-all" id="dlAllBtn" onclick="downloadAll()" style="display:none">⬇ Tout télécharger</button>
-    </div>
-
-    <div class="section-label">JOURNAL</div>
-    <div class="log-box" id="logBox">
-      <div class="log-line">
-        <span class="log-time">00:00</span>
-        <span class="log-msg info">TriangleStory prêt. Charge tes audios et gameplays.</span>
-      </div>
-    </div>
-
+  <!-- Notification -->
+  <div class="notif" id="notif">
+    <div class="notif-dot" id="notifDot"></div>
+    <span id="notifMsg"></span>
   </div>
-</main>
 
-<!-- Hidden inputs -->
-<input type="file" id="audioInput" accept="audio/*" multiple onchange="handleAudioFiles(this.files)">
-<input type="file" id="videoInputHidden" accept="video/*" onchange="handleVideoFileFromInput(this)">
-
-<!-- Notification -->
-<div class="notif" id="notif">
-  <div class="notif-dot" id="notifDot"></div>
-  <span id="notifMsg"></span>
-</div>
-
-<script>
-// ─── State ───────────────────────────────────────────────────
-const state = {
-  audios: [],
-  videos: [],        // {name, file, url, slotIdx}
-  queue: [],
-  doneBlobs: [],
-  subtitlesEnabled: true,
-  subtitleColor: '#ff3c5f',
-  isGenerating: false,
-  videoSlotTarget: 0
-};
-
-const MAX_SLOTS = 6;
-
-// ─── Init video slots ─────────────────────────────────────────
-function initVideoSlots() {
-  const grid = document.getElementById('videoGrid');
-  grid.innerHTML = '';
-  for (let i = 0; i < MAX_SLOTS; i++) {
-    const slot = document.createElement('div');
-    slot.className = 'video-slot';
-    slot.id = `vslot_${i}`;
-    slot.onclick = () => {
-      state.videoSlotTarget = i;
-      document.getElementById('videoInputHidden').click();
-    };
-    slot.innerHTML = `
-      <div class="slot-add">+</div>
-      <div class="video-slot-label">Gameplay ${i + 1}</div>
-    `;
-    grid.appendChild(slot);
-  }
-}
-
-// ─── Video slot loading ────────────────────────────────────────
-function handleVideoFileFromInput(input) {
-  const f = input.files[0];
-  if (!f) return;
-  loadVideoIntoSlot(state.videoSlotTarget, f);
-  input.value = ''; // reset so same file can be reloaded
-}
-
-function loadVideoIntoSlot(slotIdx, file) {
-  // Remove existing video in this slot if any
-  const existing = state.videos.findIndex(v => v.slotIdx === slotIdx);
-  if (existing >= 0) {
-    URL.revokeObjectURL(state.videos[existing].url);
-    state.videos.splice(existing, 1);
-  }
-
-  const url = URL.createObjectURL(file);
-  state.videos.push({ name: file.name, file, url, slotIdx });
-  state.videos.sort((a, b) => a.slotIdx - b.slotIdx);
-
-  renderVideoSlots();
-  updateStats();
-  log(`Gameplay ajouté : ${file.name}`, 'ok');
-}
-
-function removeVideoSlot(slotIdx) {
-  const idx = state.videos.findIndex(v => v.slotIdx === slotIdx);
-  if (idx >= 0) {
-    URL.revokeObjectURL(state.videos[idx].url);
-    state.videos.splice(idx, 1);
-  }
-  renderVideoSlots();
-  updateStats();
-}
-
-function renderVideoSlots() {
-  for (let i = 0; i < MAX_SLOTS; i++) {
-    const slot = document.getElementById(`vslot_${i}`);
-    const vid = state.videos.find(v => v.slotIdx === i);
-    if (vid) {
-      slot.classList.add('loaded');
-      slot.onclick = null;
-      slot.innerHTML = `
-        <video src="${vid.url}" muted loop autoplay playsinline></video>
-        <div class="video-slot-name">${vid.name.replace(/\.[^.]+$/, '').substring(0, 18)}</div>
-        <button class="video-slot-remove" onclick="event.stopPropagation();removeVideoSlot(${i})">×</button>
-      `;
-    } else {
-      slot.classList.remove('loaded');
-      slot.onclick = () => {
-        state.videoSlotTarget = i;
-        document.getElementById('videoInputHidden').click();
-      };
-      slot.innerHTML = `
-        <div class="slot-add">+</div>
-        <div class="video-slot-label">Gameplay ${i + 1}</div>
-      `;
-    }
-  }
-}
-
-// ─── Drag & Drop (audio) ───────────────────────────────────────
-const dz = document.getElementById('dropZone');
-dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
-dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
-dz.addEventListener('drop', e => {
-  e.preventDefault();
-  dz.classList.remove('drag-over');
-  const files = [...e.dataTransfer.files].filter(f =>
-    f.type.startsWith('audio/') || /\.(mp3|wav|m4a|ogg|aac|flac)$/i.test(f.name)
-  );
-  if (files.length) handleAudioFiles(files);
-  else notif('Aucun fichier audio détecté', 'warn');
-});
-dz.addEventListener('click', () => document.getElementById('audioInput').click());
-
-// Global drag & drop for video files
-document.addEventListener('dragover', e => e.preventDefault());
-document.addEventListener('drop', e => {
-  e.preventDefault();
-  const files = [...e.dataTransfer.files];
-  const audioFiles = files.filter(f => f.type.startsWith('audio/') || /\.(mp3|wav|m4a|ogg|aac|flac)$/i.test(f.name));
-  const videoFiles = files.filter(f => f.type.startsWith('video/') || /\.(mp4|mov|avi|webm|mkv)$/i.test(f.name));
-
-  if (audioFiles.length) handleAudioFiles(audioFiles);
-  videoFiles.forEach(f => {
-    const emptySlot = Array.from({length: MAX_SLOTS}, (_, i) => i).find(i => !state.videos.find(v => v.slotIdx === i));
-    if (emptySlot !== undefined) loadVideoIntoSlot(emptySlot, f);
-  });
-});
-
-// ─── Audio handling ────────────────────────────────────────────
-function handleAudioFiles(files) {
-  [...files].forEach(f => {
-    if (state.audios.find(a => a.name === f.name)) return;
-    const url = URL.createObjectURL(f);
-    const audio = new Audio(url);
-    audio.addEventListener('loadedmetadata', () => {
-      state.audios.push({ name: f.name, file: f, url, duration: audio.duration });
-      renderAudioList();
-      updateStats();
-      log(`Audio ajouté : ${f.name}`, 'ok');
-    });
-    audio.onerror = () => {
-      // Try adding without duration
-      state.audios.push({ name: f.name, file: f, url, duration: 0 });
-      renderAudioList();
-      updateStats();
-      log(`Audio ajouté (durée inconnue) : ${f.name}`, 'warn');
-    };
-  });
-}
-
-function renderAudioList() {
-  const list = document.getElementById('audioList');
-  list.innerHTML = '';
-  state.audios.forEach((a, i) => {
-    const item = document.createElement('div');
-    item.className = 'audio-item';
-    item.innerHTML = `
-      <span class="audio-num">${String(i+1).padStart(2,'0')}</span>
-      <span class="audio-name" title="${a.name}">${a.name.replace(/\.[^.]+$/, '')}</span>
-      <span class="audio-dur">${formatDur(a.duration)}</span>
-      <button class="btn-remove" onclick="removeAudio(${i})">×</button>
-    `;
-    list.appendChild(item);
-  });
-}
-
-function removeAudio(i) {
-  URL.revokeObjectURL(state.audios[i].url);
-  state.audios.splice(i, 1);
-  renderAudioList();
-  updateStats();
-}
-
-// ─── Settings ─────────────────────────────────────────────────
-document.getElementById('audioVol').addEventListener('input', function() {
-  document.getElementById('audioVolVal').textContent = this.value + '%';
-});
-document.getElementById('gameVol').addEventListener('input', function() {
-  document.getElementById('gameVolVal').textContent = this.value + '%';
-});
-
-function toggleSubtitles() {
-  state.subtitlesEnabled = !state.subtitlesEnabled;
-  document.getElementById('subtitleToggle').classList.toggle('on', state.subtitlesEnabled);
-}
-
-function pickColor(el) {
-  document.querySelectorAll('.swatch').forEach(s => s.classList.remove('selected'));
-  el.classList.add('selected');
-  state.subtitleColor = el.dataset.c;
-  updateSubPreview();
-}
-
-const demoTexts = ['UNE HISTOIRE VRAIE...', 'IL ÉTAIT AVEC ELLE', 'PENDANT TOUT CE TEMPS', 'LA VÉRITÉ ÉCLATE'];
-let demoIdx = 0;
-
-function updateSubPreview() {
-  const style = document.getElementById('subtitleStyle').value;
-  const el = document.getElementById('subPreviewText');
-  const c = state.subtitleColor;
-  el.style.cssText = '';
-  el.style.fontFamily = "'Bebas Neue', Impact, sans-serif";
-  el.style.letterSpacing = '1px';
-
-  if (style === 'tiktok') {
-    const words = demoTexts[demoIdx].split(' ');
-    el.innerHTML = words.map((w, i) => `<span style="color:${i % 3 === 0 ? c : '#fff'};text-shadow:-2px -2px 0 #000,2px 2px 0 #000">${w}</span>`).join(' ');
-    el.style.fontSize = '15px'; el.style.background = 'none';
-  } else if (style === 'clean') {
-    el.textContent = demoTexts[demoIdx];
-    el.style.color = '#fff'; el.style.background = 'rgba(0,0,0,0.55)';
-    el.style.padding = '4px 12px'; el.style.borderRadius = '4px';
-  } else if (style === 'outline') {
-    el.textContent = demoTexts[demoIdx];
-    el.style.color = '#fff';
-    el.style.textShadow = '-3px -3px 0 #000,3px -3px 0 #000,-3px 3px 0 #000,3px 3px 0 #000';
-    el.style.fontSize = '15px'; el.style.background = 'none';
-  } else if (style === 'highlight') {
-    el.textContent = demoTexts[demoIdx];
-    el.style.color = '#000'; el.style.background = c;
-    el.style.padding = '4px 12px'; el.style.borderRadius = '4px'; el.style.fontWeight = '900';
-  }
-}
-
-setInterval(() => {
-  demoIdx = (demoIdx + 1) % demoTexts.length;
-  document.getElementById('subPreviewText').textContent = demoTexts[demoIdx];
-  updateSubPreview();
-}, 2500);
-
-// ─── Queue ────────────────────────────────────────────────────
-function addAllToQueue() {
-  if (!state.audios.length) { notif('Aucun audio chargé', 'warn'); return; }
-  if (!state.videos.length) { notif('Aucun gameplay chargé', 'warn'); return; }
-
-  const mode = document.getElementById('videoMode').value;
-  let videoPool = [...state.videos];
-  if (mode === 'shuffle') videoPool = shuffleArray([...state.videos]);
-  let seqIdx = 0;
-
-  // Only add audios not yet in queue
-  const newItems = state.audios
-    .filter(audio => !state.queue.find(q => q.audio.name === audio.name))
-    .map((audio, i) => {
-      let video;
-      if (mode === 'random') video = videoPool[Math.floor(Math.random() * videoPool.length)];
-      else if (mode === 'shuffle') { video = videoPool[seqIdx % videoPool.length]; seqIdx++; }
-      else { video = videoPool[(state.queue.length + i) % videoPool.length]; }
-      return {
-        id: Date.now() + i,
-        audio, video,
-        status: 'waiting',
-        progress: 0,
-        blob: null,
-        outputName: `triangle_${sanitize(audio.name)}_${Date.now()}.webm`
-      };
-    });
-
-  if (!newItems.length) { notif('Tous les audios sont déjà en file', 'warn'); return; }
-
-  state.queue.push(...newItems);
-  renderQueue();
-  updateStats();
-  log(`${newItems.length} vidéo(s) ajoutée(s) en file`, 'ok');
-  notif(`${newItems.length} vidéo(s) en file`, 'ok');
-}
-
-function renderQueue() {
-  const list = document.getElementById('queueList');
-  document.getElementById('queueCount').textContent = `${state.queue.length} vidéo${state.queue.length > 1 ? 's' : ''}`;
-
-  if (!state.queue.length) {
-    list.innerHTML = `<div class="empty-queue"><div class="big">▷</div>Ajoute des audios et des gameplays<br>puis clique sur Générer</div>`;
-    return;
-  }
-
-  list.innerHTML = '';
-  state.queue.forEach((item, i) => {
-    const el = document.createElement('div');
-    el.className = 'queue-item' + (item.status === 'done' ? ' done' : '');
-    el.id = `qi_${item.id}`;
-    const statusLabel = { waiting: 'En attente', processing: 'Traitement...', done: 'Terminé ✓', error: 'Erreur' }[item.status];
-    el.innerHTML = `
-      <div class="queue-item-progress" style="width:${item.progress}%"></div>
-      <span class="queue-item-num">${String(i+1).padStart(2,'0')}</span>
-      <div class="queue-item-info">
-        <div class="queue-item-title">${item.audio.name.replace(/\.[^.]+$/, '').substring(0, 28)}</div>
-        <div class="queue-item-meta">
-          <span class="status-dot ${item.status}"></span>
-          <span>${statusLabel}</span>
-          <span>·</span>
-          <span style="color:var(--accent2)">${item.video.name.replace(/\.[^.]+$/, '').substring(0, 16)}</span>
-        </div>
-      </div>
-      <div class="queue-item-actions">
-        ${item.status === 'done' ? `<button class="btn-dl" onclick="downloadOne(${i})">⬇ DL</button>` : ''}
-      </div>
-    `;
-    list.appendChild(el);
-  });
-
-  document.getElementById('dlAllBtn').style.display =
-    state.queue.filter(q => q.status === 'done').length > 0 ? 'block' : 'none';
-}
-
-// ─── Generation ───────────────────────────────────────────────
-async function startGeneration() {
-  if (!state.audios.length || !state.videos.length) {
-    notif('Charge des audios ET des gameplays', 'warn'); return;
-  }
-
-  if (!state.queue.length || !state.queue.find(q => q.status === 'waiting')) {
-    addAllToQueue();
-    if (!state.queue.length) return;
-  }
-
-  if (state.isGenerating) return;
-  state.isGenerating = true;
-  const btn = document.getElementById('generateBtn');
-  btn.disabled = true;
-  btn.textContent = '⏳ GÉNÉRATION EN COURS...';
-
-  const waiting = state.queue.filter(q => q.status === 'waiting');
-  log(`Démarrage : ${waiting.length} vidéo(s) à générer`, 'warn');
-
-  for (let i = 0; i < state.queue.length; i++) {
-    if (state.queue[i].status !== 'waiting') continue;
-    await processItem(i);
-  }
-
-  state.isGenerating = false;
-  btn.disabled = false;
-  btn.textContent = '▶ GÉNÉRER LES VIDÉOS';
-
-  const done = state.queue.filter(q => q.status === 'done').length;
-  log(`Terminé ! ${done} vidéo(s) prête(s)`, 'ok');
-  notif(`${done} vidéo(s) générée(s) !`, 'ok');
-  updateStats();
-  renderQueue();
-}
-
-async function processItem(idx) {
-  const item = state.queue[idx];
-  item.status = 'processing';
-  item.progress = 5;
-  renderQueue();
-  log(`Traitement : ${item.audio.name}`, 'info');
-
-  try {
-    const blob = await renderVideo(item, (p) => {
-      item.progress = p;
-      const el = document.getElementById(`qi_${item.id}`);
-      if (el) el.querySelector('.queue-item-progress').style.width = p + '%';
-    });
-
-    item.blob = blob;
-    item.status = 'done';
-    item.progress = 100;
-    state.doneBlobs.push({ blob, name: item.outputName });
-    log(`✓ ${item.audio.name}`, 'ok');
-    updateStats();
-    renderQueue();
-  } catch(e) {
-    item.status = 'error';
-    item.progress = 0;
-    log(`Erreur : ${e.message}`, 'err');
-    console.error(e);
-    renderQueue();
-  }
-}
-
-// ─── Video rendering ──────────────────────────────────────────
-async function renderVideo(item, onProgress) {
-  onProgress(10);
-
-  const fmt = document.getElementById('outputFormat').value;
-  let cw, ch;
-  if (fmt === '9:16') { cw = 1080; ch = 1920; }
-  else if (fmt === '1:1') { cw = 1080; ch = 1080; }
-  else { cw = 1920; ch = 1080; }
-
-  const canvas = document.createElement('canvas');
-  canvas.width = cw; canvas.height = ch;
-  const ctx = canvas.getContext('2d');
-
-  // Load video element
-  const videoEl = document.createElement('video');
-  videoEl.src = item.video.url;
-  videoEl.muted = true;
-  videoEl.loop = true;
-  videoEl.preload = 'auto';
-
-  await new Promise((res, rej) => {
-    videoEl.oncanplaythrough = res;
-    videoEl.onerror = (e) => rej(new Error('Impossible de charger la vidéo : ' + item.video.name));
-    videoEl.load();
-  });
-
-  onProgress(20);
-
-  // Get audio duration
-  let audioDur = item.audio.duration;
-  if (!audioDur || audioDur <= 0) {
-    // Try to get duration from AudioBuffer
-    const tmpCtx = new AudioContext();
-    const ab = await item.audio.file.arrayBuffer();
-    const buf = await tmpCtx.decodeAudioData(ab);
-    audioDur = buf.duration;
-    tmpCtx.close();
-  }
-  if (!audioDur || audioDur <= 0) audioDur = 30;
-
-  // Generate subtitles
-  let subtitles = [];
-  if (state.subtitlesEnabled) {
-    subtitles = generateFallbackSubtitles(item.audio.name, audioDur);
-    log(`${subtitles.length} sous-titres générés`, 'info');
-  }
-
-  onProgress(35);
-
-  // Audio setup with Web Audio API
-  const audioCtx = new AudioContext();
-  const gainAudio = audioCtx.createGain();
-  const gainGame = audioCtx.createGain();
-  const dest = audioCtx.createMediaStreamDestination();
-
-  gainAudio.gain.value = parseInt(document.getElementById('audioVol').value) / 100;
-  gainGame.gain.value = parseInt(document.getElementById('gameVol').value) / 100;
-
-  // Decode story audio
-  const arrayBuf = await item.audio.file.arrayBuffer();
-  const audioBuffer = await audioCtx.decodeAudioData(arrayBuf);
-  const audioSrc = audioCtx.createBufferSource();
-  audioSrc.buffer = audioBuffer;
-  audioSrc.connect(gainAudio);
-  gainAudio.connect(dest);
-
-  // Gameplay audio
-  let gameAudioSrc = null;
-  try {
-    gameAudioSrc = audioCtx.createMediaElementSource(videoEl);
-    gameAudioSrc.connect(gainGame);
-    gainGame.connect(dest);
-  } catch(e) {
-    // Already captured or not available
-    log('Audio gameplay non disponible (ignoré)', 'warn');
-  }
-
-  onProgress(40);
-
-  // Canvas stream
-  const fps = 30;
-  const canvasStream = canvas.captureStream(fps);
-  const audioTrack = dest.stream.getAudioTracks()[0];
-  if (audioTrack) canvasStream.addTrack(audioTrack);
-
-  // MediaRecorder
-  const mimeTypes = ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm;codecs=vp9', 'video/webm'];
-  const supportedMime = mimeTypes.find(m => MediaRecorder.isTypeSupported(m)) || 'video/webm';
-
-  const recorder = new MediaRecorder(canvasStream, { mimeType: supportedMime, videoBitsPerSecond: 8000000 });
-  const chunks = [];
-  recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
-
-  // Start
-  videoEl.currentTime = 0;
-  await videoEl.play();
-  audioSrc.start(0);
-  recorder.start(100);
-
-  const startTime = audioCtx.currentTime;
-
-  await new Promise(resolve => {
-    let rafId;
-    let lastTime = 0;
-    const frameDuration = 1000 / fps;
-
-    function renderLoop(timestamp) {
-      const elapsed = audioCtx.currentTime - startTime;
-
-      if (elapsed >= audioDur) {
-        resolve();
-        return;
-      }
-
-      const progress = 40 + Math.round(Math.min(elapsed / audioDur, 1) * 57);
-      onProgress(progress);
-
-      // Throttle to fps
-      if (timestamp - lastTime >= frameDuration) {
-        drawFrame(ctx, videoEl, cw, ch, subtitles, elapsed);
-        lastTime = timestamp;
-      }
-
-      rafId = requestAnimationFrame(renderLoop);
-    }
-
-    audioSrc.onended = () => {
-      cancelAnimationFrame(rafId);
-      resolve();
-    };
-
-    rafId = requestAnimationFrame(renderLoop);
-  });
-
-  recorder.stop();
-  videoEl.pause();
-
-  onProgress(97);
-
-  await new Promise(r => { recorder.onstop = r; });
-  await audioCtx.close();
-
-  const blob = new Blob(chunks, { type: supportedMime });
-  onProgress(100);
-  return blob;
-}
-
-// ─── Frame drawing ────────────────────────────────────────────
-function drawFrame(ctx, videoEl, cw, ch, subtitles, elapsed) {
-  // Draw video (cover fill)
-  if (videoEl.readyState >= 2) {
-    const vw = videoEl.videoWidth || cw;
-    const vh = videoEl.videoHeight || ch;
-    const vAR = vw / vh;
-    const cAR = cw / ch;
-    let sx, sy, sw, sh;
-    if (vAR > cAR) {
-      sh = vh; sw = sh * cAR;
-      sx = (vw - sw) / 2; sy = 0;
-    } else {
-      sw = vw; sh = sw / cAR;
-      sx = 0; sy = (vh - sh) / 2;
-    }
-    ctx.drawImage(videoEl, sx, sy, sw, sh, 0, 0, cw, ch);
-  } else {
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, cw, ch);
-  }
-
-  // Vignette
-  const vig = ctx.createRadialGradient(cw/2, ch/2, 0, cw/2, ch/2, Math.max(cw, ch) * 0.7);
-  vig.addColorStop(0, 'rgba(0,0,0,0)');
-  vig.addColorStop(1, 'rgba(0,0,0,0.4)');
-  ctx.fillStyle = vig;
-  ctx.fillRect(0, 0, cw, ch);
-
-  // Bottom gradient for subtitles
-  if (subtitles.length) {
-    const grad = ctx.createLinearGradient(0, ch * 0.65, 0, ch);
-    grad.addColorStop(0, 'rgba(0,0,0,0)');
-    grad.addColorStop(1, 'rgba(0,0,0,0.65)');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, ch * 0.65, cw, ch * 0.35);
-  }
-
-  // Subtitles
-  if (subtitles.length) {
-    const sub = subtitles.find(s => elapsed >= s.start && elapsed < s.end);
-    if (sub) drawSubtitle(ctx, sub.text, cw, ch);
-  }
-}
-
-function drawSubtitle(ctx, text, cw, ch) {
-  const style = document.getElementById('subtitleStyle').value;
-  const color = state.subtitleColor;
-  const fontSize = Math.max(Math.round(cw * 0.052), 28);
-  const y = ch * 0.80;
-  const maxW = cw * 0.85;
-
-  ctx.save();
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.font = `900 ${fontSize}px Impact, 'Arial Black', sans-serif`;
-
-  const lines = wrapText(ctx, text, maxW);
-  const lineH = fontSize * 1.35;
-  const totalH = lines.length * lineH;
-  const startY = y - totalH / 2 + lineH / 2;
-
-  lines.forEach((line, li) => {
-    const ly = startY + li * lineH;
-
-    if (style === 'tiktok') {
-      const words = line.split(' ');
-      let xOffset = 0;
-      const totalW = ctx.measureText(line).width;
-      let curX = cw / 2 - totalW / 2;
-      words.forEach((word, wi) => {
-        const ww = ctx.measureText(word + ' ').width;
-        const wx = curX + ww / 2;
-        const isAccent = (li + wi) % 3 === 0;
-        ctx.strokeStyle = '#000'; ctx.lineWidth = fontSize * 0.12;
-        ctx.strokeText(word, wx, ly);
-        ctx.fillStyle = isAccent ? color : '#fff';
-        ctx.fillText(word, wx, ly);
-        curX += ww;
-      });
-    } else if (style === 'clean') {
-      const tw = ctx.measureText(line).width;
-      const pad = fontSize * 0.4;
-      ctx.fillStyle = 'rgba(0,0,0,0.55)';
-      roundRect(ctx, cw/2 - tw/2 - pad, ly - fontSize/2 - pad*0.5, tw + pad*2, fontSize + pad, fontSize * 0.25);
-      ctx.fillStyle = '#fff';
-      ctx.fillText(line, cw/2, ly);
-    } else if (style === 'outline') {
-      ctx.strokeStyle = '#000'; ctx.lineWidth = fontSize * 0.14; ctx.lineJoin = 'round';
-      ctx.strokeText(line, cw/2, ly);
-      ctx.fillStyle = '#fff';
-      ctx.fillText(line, cw/2, ly);
-    } else if (style === 'highlight') {
-      const tw = ctx.measureText(line).width;
-      const pad = fontSize * 0.35;
-      ctx.fillStyle = color;
-      roundRect(ctx, cw/2 - tw/2 - pad, ly - fontSize/2 - pad*0.4, tw + pad*2, fontSize + pad*0.8, pad * 0.3);
-      ctx.fillStyle = '#000';
-      ctx.fillText(line, cw/2, ly);
-    }
-  });
-
-  ctx.restore();
-}
-
-function wrapText(ctx, text, maxW) {
-  const words = text.split(' ');
-  const lines = [];
-  let cur = '';
-  words.forEach(w => {
-    const test = cur ? cur + ' ' + w : w;
-    if (ctx.measureText(test).width > maxW && cur) { lines.push(cur); cur = w; }
-    else cur = test;
-  });
-  if (cur) lines.push(cur);
-  return lines;
-}
-
-function roundRect(ctx, x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-  ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-  ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-  ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
-  ctx.closePath();
-  ctx.fill();
-}
-
-// ─── Subtitles ────────────────────────────────────────────────
-function generateFallbackSubtitles(name, duration) {
-  const storyPhrases = [
-    "UNE HISTOIRE VRAIE...",
-    "TOUT A COMMENCÉ UN SOIR...",
-    "IL ME PRÉSENTAIT COMME SON AMI",
-    "MAIS QUELQUE CHOSE N'ALLAIT PAS",
-    "J'AI DÉCOUVERT LA VÉRITÉ",
-    "IL ÉTAIT AVEC EUX DEUX...",
-    "PENDANT TOUT CE TEMPS...",
-    "JE N'AVAIS RIEN VU VENIR",
-    "C'ÉTAIT UN TRIANGLE",
-    "ET MOI J'ÉTAIS LE DERNIER À SAVOIR",
-    "CE QUI S'EST PASSÉ ENSUITE...",
-    "VOUS N'ALLEZ PAS LE CROIRE",
-    "IL M'A TOUT AVOUÉ",
-    "LES LARMES AUX YEUX",
-    "MAIS IL ÉTAIT TROP TARD",
-    "J'AVAIS DÉJÀ TOURNÉ LA PAGE",
-    "FIN.",
-  ];
-
-  const count = Math.ceil(duration / 2.5);
-  const result = [];
-  for (let i = 0; i < count; i++) {
-    const phrase = storyPhrases[i % storyPhrases.length];
-    result.push({
-      start: i * 2.5,
-      end: (i + 1) * 2.5,
-      text: phrase
-    });
-  }
-  return result;
-}
-
-// ─── Download ─────────────────────────────────────────────────
-function downloadOne(idx) {
-  const item = state.queue[idx];
-  if (!item || !item.blob) return;
-  triggerDownload(item.blob, item.outputName);
-  log(`Téléchargement : ${item.outputName}`, 'ok');
-}
-
-function downloadAll() {
-  const done = state.queue.filter(q => q.status === 'done');
-  done.forEach((item, i) => {
-    setTimeout(() => triggerDownload(item.blob, item.outputName), i * 700);
-  });
-  log(`${done.length} téléchargement(s) lancé(s)`, 'ok');
-  notif(`${done.length} téléchargements lancés`, 'ok');
-}
-
-function triggerDownload(blob, name) {
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = name;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-}
-
-// ─── Utils ────────────────────────────────────────────────────
-function clearAll() {
-  if (state.isGenerating) { notif('Génération en cours, attends la fin', 'warn'); return; }
-  state.audios.forEach(a => URL.revokeObjectURL(a.url));
-  state.videos.forEach(v => URL.revokeObjectURL(v.url));
-  state.audios = []; state.videos = []; state.queue = []; state.doneBlobs = [];
-  renderAudioList(); renderVideoSlots(); renderQueue(); updateStats();
-  log('Tout effacé', 'warn');
-}
-
-function updateStats() {
-  document.getElementById('statAudios').textContent = state.audios.length;
-  document.getElementById('statVideos').textContent = state.videos.length;
-  document.getElementById('statDone').textContent = state.queue.filter(q => q.status === 'done').length;
-  document.getElementById('totalCount').textContent =
-    `${state.audios.length} audio${state.audios.length > 1 ? 's' : ''} · ${state.videos.length} vidéo${state.videos.length > 1 ? 's' : ''}`;
-}
-
-function formatDur(s) {
-  if (!s || isNaN(s) || s <= 0) return '--:--';
-  const m = Math.floor(s / 60), sec = Math.floor(s % 60);
-  return `${m}:${String(sec).padStart(2,'0')}`;
-}
-
-function sanitize(name) {
-  return name.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 20);
-}
-
-function shuffleArray(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-
-let logStart = Date.now();
-function log(msg, type = 'info') {
-  const box = document.getElementById('logBox');
-  const elapsed = (Date.now() - logStart) / 1000;
-  const ts = String(Math.floor(elapsed / 60)).padStart(2,'0') + ':' + String(Math.floor(elapsed % 60)).padStart(2,'0');
-  const line = document.createElement('div');
-  line.className = 'log-line';
-  line.innerHTML = `<span class="log-time">${ts}</span><span class="log-msg ${type}">${msg}</span>`;
-  box.appendChild(line);
-  box.scrollTop = box.scrollHeight;
-}
-
-let notifTimer;
-function notif(msg, type = 'info') {
-  const colors = { ok: '#22c55e', warn: '#ff9f1c', err: '#ff3c5f', info: '#6b7280' };
-  document.getElementById('notifDot').style.background = colors[type] || colors.info;
-  document.getElementById('notifMsg').textContent = msg;
-  const el = document.getElementById('notif');
-  el.classList.add('show');
-  clearTimeout(notifTimer);
-  notifTimer = setTimeout(() => el.classList.remove('show'), 3500);
-}
-
-// ─── Init ─────────────────────────────────────────────────────
-initVideoSlots();
-updateSubPreview();
-updateStats();
-</script>
+  <script src="script.js"></script>
 </body>
+
 </html>
